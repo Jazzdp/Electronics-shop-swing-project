@@ -1,7 +1,7 @@
 package main;
 
 import javax.swing.JFrame;
-
+//hada test brk to make sure it works. hna our main obvi
 public class main {
     public static void main(String[] args) {
         //
