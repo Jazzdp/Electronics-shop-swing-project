@@ -1,4 +1,4 @@
 package shop.ui;
-public class CheckoutPage {
+public class CheckoutPanel {
     
 }

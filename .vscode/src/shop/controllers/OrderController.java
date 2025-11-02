@@ -1,7 +1,6 @@
 package shop.controllers;
 
 import shop.model.Order;
-import shop.model.Cart;
 import shop.model.CartItem;
 import shop.repositories.OrderRepository;
 import shop.repositories.ProductRepository;
@@ -22,16 +21,16 @@ public class OrderController {
     }
 
     public Order createOrder(String customerName, String customerEmail, String customerPhone,
-                           String shippingAddress, Cart cart) {
+                           String shippingAddress, List<CartItem> items) {
         // Validate inputs
         validateOrderData(customerName, customerEmail, customerPhone, shippingAddress);
         
-        if (cart.getItems().isEmpty()) {
+        if (items == null || items.isEmpty()) {
             throw new IllegalArgumentException("Cart cannot be empty");
         }
 
-        // Check stock availability and update stock
-        for (CartItem item : cart.getItems()) {
+        // Check stock availability
+        for (CartItem item : items) {
             if (item.getQuantity() > item.getProduct().getStockQuantity()) {
                 throw new IllegalStateException("Insufficient stock for product: " + 
                                              item.getProduct().getName());
@@ -40,11 +39,11 @@ public class OrderController {
 
         // Create and save order
         Order order = new Order(customerName, customerEmail, customerPhone, 
-                              shippingAddress, cart.getItems());
+                              shippingAddress, items);
         order = orderRepository.save(order);
 
-        // Update stock levels
-        updateStockLevels(cart.getItems());
+        // Update stock levels (persisted)
+        updateStockLevels(items);
 
         return order;
     }
@@ -82,11 +81,12 @@ public class OrderController {
             throw new IllegalStateException("Can only cancel orders in PENDING status");
         }
 
-        // Restore stock levels
+        // Restore stock levels and persist changes
         for (CartItem item : order.getItems()) {
-            productRepository.findById(item.getProduct().getId()).setStockQuantity(
-                item.getProduct().getStockQuantity() + item.getQuantity()
-            );
+            var prodFromDb = productRepository.findById(item.getProduct().getId());
+            if (prodFromDb == null) continue; // product deleted from catalog
+            prodFromDb.setStockQuantity(prodFromDb.getStockQuantity() + item.getQuantity());
+            productRepository.update(prodFromDb);
         }
 
         order.setStatus("CANCELLED");
@@ -95,10 +95,10 @@ public class OrderController {
 
     private void updateStockLevels(List<CartItem> items) {
         for (CartItem item : items) {
-            item.getProduct().setStockQuantity(
-                item.getProduct().getStockQuantity() - item.getQuantity()
-            );
-            productRepository.update(item.getProduct());
+            var prodFromDb = productRepository.findById(item.getProduct().getId());
+            if (prodFromDb == null) continue; // product removed concurrently
+            prodFromDb.setStockQuantity(prodFromDb.getStockQuantity() - item.getQuantity());
+            productRepository.update(prodFromDb);
         }
     }
 

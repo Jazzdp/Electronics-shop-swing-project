@@ -1,4 +1,4 @@
-package shop;
+package shop.ui;
 public class MainFrame {
     
 }
