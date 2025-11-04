@@ -1,0 +1,69 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'dou3aze'
+version = '0.1.0'
+sourceCompatibility = '11'
+
+defaultTasks 'build'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // MySQL driver used at runtime
+    implementation 'mysql:mysql-connector-j:9.3.0'
+
+    // Flyway for optional DB migrations (you can remove if you don't want it)
+    implementation 'org.flywaydb:flyway-core:9.22.0'
+
+    testImplementation 'junit:junit:4.13.2'
+}
+
+// Project uses a non-standard layout (sources under `src/` and resources under `src/resources/`)
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs = ['src/resources']
+        }
+    }
+    test {
+        java {
+            srcDirs = ['test']
+        }
+    }
+}
+
+application {
+    // Main class of the app
+    mainClassName = 'shop.Main'
+}
+
+// Create a fat/shadow jar for easy distribution
+shadowJar {
+    archiveBaseName.set('electronics-shop-all')
+    archiveClassifier.set('')
+    archiveVersion.set(version)
+    mergeServiceFiles()
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'shop.Main'
+    }
+}
+
+// Convenience task to run the app using Gradle (uses the project classpath)
+tasks.register('runApp', JavaExec) {
+    group = 'application'
+    description = 'Run the application using the project classpath'
+    main = 'shop.Main'
+    classpath = sourceSets.main.runtimeClasspath
+}

@@ -26,8 +26,12 @@ public class DbConfig {
             
             // Load the JDBC driver
             Class.forName(properties.getProperty("db.driver"));
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             throw new RuntimeException("Error loading database properties", e);
+        } catch (ClassNotFoundException e) {
+            // JDBC driver not found on classpath. Allow application to start for UI-only
+            // runs; connection attempts will still fail if no driver is present.
+            System.err.println("Warning: JDBC driver not found on classpath: " + e.getMessage());
         }
     }
 
@@ -40,6 +44,26 @@ public class DbConfig {
             );
         }
         return connection;
+    }
+
+    // Helpful accessors for other classes (e.g. migration/bootstrap code)
+    public static String getUrl() {
+        return properties.getProperty("db.url");
+    }
+
+    public static String getUsername() {
+        return properties.getProperty("db.username");
+    }
+
+    public static String getPassword() {
+        return properties.getProperty("db.password");
+    }
+
+    /**
+     * Generic accessor for properties loaded from app.properties.
+     */
+    public static String getProperty(String key) {
+        return properties.getProperty(key);
     }
 
     public static void closeConnection() {
