@@ -15,7 +15,7 @@ public class CartController {
         this.productRepository = productRepository;
     }
 
-    public void addToCart(Long userId, Long productId, int quantity) {
+    public void addToCart(Long productId, int quantity) {
         if (quantity <= 0) {
             throw new IllegalArgumentException("Quantity must be greater than zero");
         }
@@ -29,27 +29,27 @@ public class CartController {
             throw new IllegalStateException("Insufficient stock");
         }
 
-        if (cartRepository.existsInCart(userId, productId)) {
+        if (cartRepository.existsInCart(productId)) {
             // Update existing cart item
-            List<CartItem> cartItems = cartRepository.getCartItems(userId);
+            List<CartItem> cartItems = cartRepository.getCartItems();
             for (CartItem item : cartItems) {
                 if (item.getProduct().getId().equals(productId)) {
                     int newQuantity = item.getQuantity() + quantity;
                     if (product.getStockQuantity() < newQuantity) {
                         throw new IllegalStateException("Insufficient stock");
                     }
-                    cartRepository.updateCartItemQuantity(userId, productId, newQuantity);
+                    cartRepository.updateCartItemQuantity(productId, newQuantity);
                     return;
                 }
             }
         } else {
             // Add new cart item
             CartItem cartItem = new CartItem(product, quantity);
-            cartRepository.saveCartItem(userId, cartItem);
+            cartRepository.saveCartItem(cartItem);
         }
     }
 
-    public void updateQuantity(Long userId, Long productId, int quantity) {
+    public void updateQuantity(Long productId, int quantity) {
         if (quantity < 0) {
             throw new IllegalArgumentException("Quantity cannot be negative");
         }
@@ -64,32 +64,32 @@ public class CartController {
         }
 
         if (quantity == 0) {
-            removeFromCart(userId, productId);
+            removeFromCart(productId);
         } else {
-            cartRepository.updateCartItemQuantity(userId, productId, quantity);
+            cartRepository.updateCartItemQuantity(productId, quantity);
         }
     }
 
-    public void removeFromCart(Long userId, Long productId) {
-        cartRepository.removeCartItem(userId, productId);
+    public void removeFromCart(Long productId) {
+        cartRepository.removeCartItem(productId);
     }
 
-    public void clearCart(Long userId) {
-        cartRepository.clearCart(userId);
+    public void clearCart() {
+        cartRepository.clearCart();
     }
 
-    public List<CartItem> getCartItems(Long userId) {
-        return cartRepository.getCartItems(userId);
+    public List<CartItem> getCartItems() {
+        return cartRepository.getCartItems();
     }
 
-    public double getCartTotal(Long userId) {
-        return getCartItems(userId).stream()
+    public double getCartTotal() {
+        return getCartItems().stream()
                 .mapToDouble(CartItem::getSubtotal)
                 .sum();
     }
 
-    public int getItemCount(Long userId) {
-        return getCartItems(userId).stream()
+    public int getItemCount() {
+        return getCartItems().stream()
                 .mapToInt(CartItem::getQuantity)
                 .sum();
     }

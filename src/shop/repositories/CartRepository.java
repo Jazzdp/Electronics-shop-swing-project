@@ -14,69 +14,62 @@ public class CartRepository {
         this.productRepository = productRepository;
     }
 
-    public void saveCartItem(Long userId, CartItem item) {
-        String sql = "INSERT INTO cart_items (user_id, product_id, quantity) VALUES (?, ?, ?)";
-        
+    public void saveCartItem(CartItem item) {
+        String sql = "INSERT INTO cart_items (product_id, quantity) VALUES (?, ?)";
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, userId);
-            stmt.setLong(2, item.getProduct().getId());
-            stmt.setInt(3, item.getQuantity());
+            stmt.setLong(1, item.getProduct().getId());
+            stmt.setInt(2, item.getQuantity());
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error saving cart item", e);
         }
     }
 
-    public void updateCartItemQuantity(Long userId, Long productId, int quantity) {
-        String sql = "UPDATE cart_items SET quantity = ? WHERE user_id = ? AND product_id = ?";
-        
+    public void updateCartItemQuantity(Long productId, int quantity) {
+        String sql = "UPDATE cart_items SET quantity = ? WHERE product_id = ?";
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, quantity);
-            stmt.setLong(2, userId);
-            stmt.setLong(3, productId);
+            stmt.setLong(2, productId);
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error updating cart item quantity", e);
         }
     }
 
-    public void removeCartItem(Long userId, Long productId) {
-        String sql = "DELETE FROM cart_items WHERE user_id = ? AND product_id = ?";
-        
+    public void removeCartItem(Long productId) {
+        String sql = "DELETE FROM cart_items WHERE product_id = ?";
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, userId);
-            stmt.setLong(2, productId);
+            stmt.setLong(1, productId);
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error removing cart item", e);
         }
     }
 
-    public void clearCart(Long userId) {
-        String sql = "DELETE FROM cart_items WHERE user_id = ?";
-        
+    public void clearCart() {
+        String sql = "DELETE FROM cart_items";
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, userId);
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Error clearing cart", e);
         }
     }
 
-    public List<CartItem> getCartItems(Long userId) {
-        String sql = "SELECT ci.product_id, ci.quantity FROM cart_items ci WHERE ci.user_id = ?";
+    public List<CartItem> getCartItems() {
+        String sql = "SELECT ci.product_id, ci.quantity FROM cart_items ci";
         List<CartItem> items = new ArrayList<>();
-        
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, userId);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    CartItem item = new CartItem();
-                    item.setProduct(productRepository.findById(rs.getLong("product_id")));
-                    item.setQuantity(rs.getInt("quantity"));
-                    items.add(item);
-                }
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                CartItem item = new CartItem();
+                item.setProduct(productRepository.findById(rs.getLong("product_id")));
+                item.setQuantity(rs.getInt("quantity"));
+                items.add(item);
             }
             return items;
         } catch (SQLException e) {
@@ -84,13 +77,12 @@ public class CartRepository {
         }
     }
 
-    public boolean existsInCart(Long userId, Long productId) {
-        String sql = "SELECT COUNT(*) FROM cart_items WHERE user_id = ? AND product_id = ?";
-        
+    public boolean existsInCart(Long productId) {
+        String sql = "SELECT COUNT(*) FROM cart_items WHERE product_id = ?";
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setLong(1, userId);
-            stmt.setLong(2, productId);
-            
+            stmt.setLong(1, productId);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1) > 0;

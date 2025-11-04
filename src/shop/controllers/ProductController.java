@@ -11,20 +11,20 @@ public class ProductController {
         this.productRepository = productRepository;
     }
 
-    public Product addProduct(String picUrl, String name, String modelNumber, 
+    public Product addProduct(String picUrl, String name,String category, String modelNumber, 
                             int warrantyMonths, double price, String description, 
                             int stockQuantity) {
         validateProductData(name, modelNumber, warrantyMonths, price, stockQuantity);
         
-        Product product = new Product(picUrl, name, modelNumber, warrantyMonths, 
+        Product product = new Product(picUrl, name, category, modelNumber, warrantyMonths, 
                                     price, description, stockQuantity);
         return productRepository.save(product);
     }
 
-    public Product updateProduct(Long id, String picUrl, String name, String modelNumber, 
+    public Product updateProduct(Long id, String picUrl, String name, String category ,String modelNumber, 
                                int warrantyMonths, double price, String description, 
                                int stockQuantity) {
-        validateProductData(name, modelNumber, warrantyMonths, price, stockQuantity);
+        validateProductData(name, modelNumber, warrantyMonths, price, stockQuantity );
         
         Product product = productRepository.findById(id);
         if (product == null) {
@@ -33,6 +33,7 @@ public class ProductController {
 
         product.setPicUrl(picUrl);
         product.setName(name);
+        product.setCategory(category);
         product.setModelNumber(modelNumber);
         product.setWarrantyMonths(warrantyMonths);
         product.setPrice(price);

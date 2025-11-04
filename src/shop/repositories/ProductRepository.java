@@ -13,17 +13,18 @@ public class ProductRepository {
     }
 
     public Product save(Product product) {
-        String sql = "INSERT INTO products (pic_url, name, model_number, warranty_months, price, description, stock_quantity) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO products (pic_url, name,category, model_number, warranty_months, price, description, stock_quantity) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
                     
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, product.getPicUrl());
             stmt.setString(2, product.getName());
-            stmt.setString(3, product.getModelNumber());
-            stmt.setInt(4, product.getWarrantyMonths());
-            stmt.setDouble(5, product.getPrice());
-            stmt.setString(6, product.getDescription());
-            stmt.setInt(7, product.getStockQuantity());
+            stmt.setString(3, product.getCategory());
+            stmt.setString(4, product.getModelNumber());
+            stmt.setInt(5, product.getWarrantyMonths());
+            stmt.setDouble(6, product.getPrice());
+            stmt.setString(7, product.getDescription());
+            stmt.setInt(8, product.getStockQuantity());
 
             int affected = stmt.executeUpdate();
             if (affected == 0) {
@@ -44,19 +45,20 @@ public class ProductRepository {
     }
 
     public Product update(Product product) {
-        String sql = "UPDATE products SET pic_url = ?, name = ?, model_number = ?, " +
+        String sql = "UPDATE products SET pic_url = ?, name = ?,category=?, model_number = ?, " +
                     "warranty_months = ?, price = ?, description = ?, stock_quantity = ? " +
                     "WHERE id = ?";
                     
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, product.getPicUrl());
             stmt.setString(2, product.getName());
-            stmt.setString(3, product.getModelNumber());
-            stmt.setInt(4, product.getWarrantyMonths());
-            stmt.setDouble(5, product.getPrice());
-            stmt.setString(6, product.getDescription());
-            stmt.setInt(7, product.getStockQuantity());
-            stmt.setLong(8, product.getId());
+            stmt.setString(3, product.getCategory());
+            stmt.setString(4, product.getModelNumber());
+            stmt.setInt(5, product.getWarrantyMonths());
+            stmt.setDouble(6, product.getPrice());
+            stmt.setString(7, product.getDescription());
+            stmt.setInt(8, product.getStockQuantity());
+            stmt.setLong(9, product.getId());
 
             int affected = stmt.executeUpdate();
             if (affected == 0) {
@@ -115,6 +117,7 @@ public class ProductRepository {
         product.setId(rs.getLong("id"));
         product.setPicUrl(rs.getString("pic_url"));
         product.setName(rs.getString("name"));
+        product.setCategory(rs.getString("category"));
         product.setModelNumber(rs.getString("model_number"));
         product.setWarrantyMonths(rs.getInt("warranty_months"));
         product.setPrice(rs.getDouble("price"));

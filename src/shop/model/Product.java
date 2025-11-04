@@ -5,6 +5,7 @@ public class Product {
     private String picUrl;
     private String name;
     private String modelNumber;
+    private String category;
     private int warrantyMonths;
     private double price;
     private String description;
@@ -14,11 +15,12 @@ public class Product {
     public Product() {}
 
     // Constructor with fields
-    public Product(String picUrl, String name, String modelNumber, 
+    public Product(String picUrl, String name,String category , String modelNumber, 
                   int warrantyMonths, double price, String description, 
                   int stockQuantity) {
         this.picUrl = picUrl;
         this.name = name;
+        this.category = category;
         this.modelNumber = modelNumber;
         this.warrantyMonths = warrantyMonths;
         this.price = price;
@@ -50,7 +52,12 @@ public class Product {
     public void setName(String name) {
         this.name = name;
     }
-
+public String getCategory() {
+        return category;
+    }
+    public void setCategory(String category) {
+        this.category = category;
+    }
     public String getModelNumber() {
         return modelNumber;
     }
@@ -98,7 +105,7 @@ public class Product {
                 ", name='" + name + '\'' +
                 ", modelNumber='" + modelNumber + '\'' +
                 ", price=" + price +
-                ", stockQuantity=" + stockQuantity +
+                ", stockQuantity=" + stockQuantity + "category='" + category + '\'' +
                 '}';
     }
 }

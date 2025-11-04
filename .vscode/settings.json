@@ -1,7 +1,30 @@
+
 {
-    "java.project.sourcePaths": ["src"],
-    "java.project.outputPath": "bin",
-    "java.project.referencedLibraries": [
-        "lib/**/*.jar"
-    ]
+  // Project layout for the Java extension
+  "java.project.sourcePaths": ["src"],
+  "java.project.outputPath": "bin",
+
+  // Prefer Gradle import
+  "java.import.gradle.enabled": true,
+  "java.import.maven.enabled": false,
+
+  // Let VS Code know about libraries that are not in the Gradle/Maven classpath
+  "java.project.referencedLibraries": [
+    "lib/**/*.jar",
+    "C:/Users/hasna/.m2/repository/com/mysql/mysql-connector-j/9.3.0/mysql-connector-j-9.3.0.jar"
+  ],
+
+  // Exclude build output and large folders from file explorer and watcher
+  "files.exclude": {
+    "out/": true,
+    "bin/": true,
+    "build/": true,
+    ".gradle/": true
+  },
+  "files.watcherExclude": {
+    "out/**": true,
+    "bin/**": true,
+    "build/**": true,
+    ".gradle/**": true
+  }
 }
