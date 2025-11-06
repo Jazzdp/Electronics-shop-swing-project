@@ -4,6 +4,7 @@ import shop.model.Product;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ProductRepository {
     private final Connection connection;
@@ -94,6 +95,23 @@ public class ProductRepository {
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error finding product by ID", e);
+        }
+    }
+
+    public List<Product> findByCategory(String category) {
+        String sql = "SELECT * FROM products WHERE category = ? ORDER BY name";
+        List<Product> products = new ArrayList<>();
+        
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, category);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    products.add(mapResultSetToProduct(rs));
+                }
+                return products;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error finding products by category", e);
         }
     }
 
