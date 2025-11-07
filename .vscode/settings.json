@@ -26,5 +26,6 @@
     "bin/**": true,
     "build/**": true,
     ".gradle/**": true
-  }
+  },
+  "java.configuration.updateBuildConfiguration": "interactive"
 }

@@ -1,0 +1,26 @@
+package shop.util;
+
+import java.awt.Color;
+
+// vibe coded ts for the colors IM SORRY I COULDNT FIGURE IT OUT
+public final class Palette {
+    private Palette() {}
+
+    // Primary header color (deep blue)
+    public static final Color PRIMARY = new Color(21, 59, 122); // #153B7A
+    public static final Color ON_PRIMARY = Color.WHITE;
+
+    // Backgrounds / surfaces
+    public static final Color SURFACE = Color.WHITE;
+    public static final Color SURFACE_ALT = new Color(250, 251, 253);
+
+    // Cards / borders
+    public static final Color CARD_BORDER = new Color(230, 230, 235);
+    public static final Color MUTED_TEXT = new Color(120, 130, 140);
+
+    // Accent / price green
+    public static final Color PRICE_GREEN = new Color(22, 163, 74); // approx green used for prices
+
+    // Search / light gray background
+    public static final Color SEARCH_BG = new Color(245, 247, 250);
+}
