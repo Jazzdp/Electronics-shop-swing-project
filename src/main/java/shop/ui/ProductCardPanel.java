@@ -1,7 +1,7 @@
 package shop.ui;
 
-import javax.swing.*;
-
+import javax.swing.*; 
+import java.awt.image.BufferedImage;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import shop.controllers.ProductController;
@@ -12,7 +12,6 @@ import java.util.List;
 public class ProductCardPanel extends JPanel {
     private final ProductController productController;
     private JPanel cardsContainer;
-
     public ProductCardPanel(ProductController productController) {
         this.productController = productController;
         setLayout(new BorderLayout());
@@ -20,7 +19,7 @@ public class ProductCardPanel extends JPanel {
 
         // Create scrollable container for product cards
         cardsContainer = new JPanel();
-        cardsContainer.setLayout(new FlowLayout(FlowLayout.LEFT, 20, 20));
+        cardsContainer.setLayout(new GridLayout(3,10,10,10));
         cardsContainer.setBackground(Color.WHITE);
 
         JScrollPane scrollPane = new JScrollPane(cardsContainer);
@@ -76,25 +75,33 @@ public class ProductCardPanel extends JPanel {
         cardsContainer.repaint();
     }
 
-    // Create product card from Product model
+ // Create product card from Product model
     private JPanel createProductCardFromModel(Product product) {
-        // Load image from URL or use default
         Image img = loadImage(product.getPicUrl());
-        
-        // Format warranty text
-        String warrantyText = product.getWarrantyMonths() + " " + 
-                            (product.getWarrantyMonths() == 1 ? "Month" : "Months");
-        
+
+        String warrantyText = product.getWarrantyMonths() + " " +
+                (product.getWarrantyMonths() == 1 ? "Month" : "Months");
+
+        // Adaptation : respecter l’ordre et le nombre de paramètres exacts de createProductCard
         return createProductCard(
-            img,
-            product.getName(),
-            product.getCategory(),
-            product.getModelNumber(),
-            warrantyText,
-            product.getPrice(),
-            product.getId(),
-            product.getStockQuantity()
+            img,                         // Image
+            product.getName(),            // productName
+                       
+            product.getCategory(),        // tagText
+            product.getModelNumber(),     // model
+            warrantyText,                 // warranty
+            product.getPrice()            // price
         );
+    }
+    private Image getDefaultImage() {
+        Image img = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
+        Graphics g = img.getGraphics();
+        g.setColor(Color.LIGHT_GRAY);
+        g.fillRect(0, 0, 200, 200);
+        g.setColor(Color.DARK_GRAY);
+        g.drawString("No Image", 70, 100);
+        g.dispose();
+        return img;
     }
 
     // Load image from URL or file path
@@ -103,158 +110,115 @@ public class ProductCardPanel extends JPanel {
             if (picUrl == null || picUrl.isEmpty()) {
                 return getDefaultImage();
             }
-            
-            // Try loading as URL first
+
+            ImageIcon icon;
+
+            // Si c’est une URL distante
             if (picUrl.startsWith("http://") || picUrl.startsWith("https://")) {
                 URL url = new URL(picUrl);
-                ImageIcon icon = new ImageIcon(url);
-                return icon.getImage();
+                icon = new ImageIcon(url);
+            } else {
+                // Sinon, on tente en local (fichier)
+                icon = new ImageIcon(picUrl);
             }
-            
-            // Try loading as local file
-            ImageIcon icon = new ImageIcon(picUrl);
-            if (icon.getImageLoadStatus() == MediaTracker.COMPLETE) {
-                return icon.getImage();
+
+            Image img = icon.getImage();
+            if (img == null || icon.getIconWidth() <= 0 || icon.getIconHeight() <= 0) {
+                return getDefaultImage();
             }
-            
-            return getDefaultImage();
+
+            return img;
         } catch (Exception e) {
-            System.err.println("Error loading image: " + picUrl);
+            System.err.println("Error loading image: " + picUrl + " — " + e.getMessage());
             return getDefaultImage();
         }
     }
 
-    // Get default placeholder image
-    private Image getDefaultImage() {
-        // Create a simple placeholder image
-        return new ImageIcon(createPlaceholderImage()).getImage();
-    }
-
-    private java.awt.image.BufferedImage createPlaceholderImage() {
-        java.awt.image.BufferedImage img = new java.awt.image.BufferedImage(310, 260, 
-            java.awt.image.BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2 = img.createGraphics();
-        g2.setColor(new Color(0xF0F0F0));
-        g2.fillRect(0, 0, 310, 260);
-        g2.setColor(Color.GRAY);
-        g2.setFont(new Font("SansSerif", Font.PLAIN, 16));
-        g2.drawString("No Image", 120, 130);
-        g2.dispose();
-        return img;
-    }
-
-    public static JPanel createProductCard(Image productImage, String productName, 
-                                          String category, String model, String warranty, 
-                                          double price, Long productId, int stockQuantity) {
+    public static JPanel createProductCard(Image productImage, String productName, String tagText, String model, String warranty, double price) {
         JPanel card = createProductPanel(350, 560);
         JPanel content = (JPanel) card.getComponent(0);
         content.setAlignmentX(Component.LEFT_ALIGNMENT);
         content.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
-        // Image panel
+        // Creating the image component (u can modify the parms values)
         JPanel imagePanel = createImagePanel(productImage, 310, 260);
-        imagePanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        imagePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 260));
+        imagePanel.setAlignmentX(Component.CENTER_ALIGNMENT); 
+        imagePanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 260)); 
         content.add(imagePanel);
         content.add(Box.createVerticalStrut(15));
 
-        // Prepare left alignment helper
+        //Filling available width and align left (DO NOT TOUCH IT)
         java.util.function.Consumer<JLabel> prepareLeft = lbl -> {
             lbl.setAlignmentX(Component.LEFT_ALIGNMENT);
             lbl.setHorizontalAlignment(SwingConstants.LEFT);
             lbl.setMaximumSize(new Dimension(Integer.MAX_VALUE, lbl.getPreferredSize().height));
         };
 
-        // Product name
-        JLabel textProductName = createProductCarteTextLabel(productName, "SansSerif", 18, 
-            Color.BLACK, JLabel.LEFT, Font.BOLD);
+        // Adding the product name (u guys are free to change parms too)
+        JLabel textProductName = createProductCarteTextLabel(productName, "SansSerif", 18, Color.BLACK, JLabel.LEFT, Font.BOLD);
         prepareLeft.accept(textProductName);
         content.add(textProductName);
         content.add(Box.createVerticalStrut(5));
 
-        // Category tag
-        JLabel tagLabel = createTagLabel(category);
+
+        //Creating the tag that contains the product type(DO NOT TOUCH IT)
+        JLabel tagLabel = createTagLabel(tagText);
         tagLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        tagLabel.setMaximumSize(tagLabel.getPreferredSize());
+        tagLabel.setMaximumSize(tagLabel.getPreferredSize()); 
         content.add(tagLabel);
         content.add(Box.createVerticalStrut(10));
 
-        // Model
-        JLabel modelLabel = createProductCarteTextLabel("Model: " + model, "SansSerif", 14, 
-            new Color(0x555555), JLabel.LEFT, Font.PLAIN);
+        // Adding the model and the warranty of the product (u can also change params here)
+        JLabel modelLabel = createProductCarteTextLabel("Model: " + model, "SansSerif", 14, new Color(0x555555), JLabel.LEFT, Font.PLAIN);
         prepareLeft.accept(modelLabel);
         content.add(modelLabel);
         content.add(Box.createVerticalStrut(5));
 
-        // Warranty
-        JLabel warrantyLabel = createProductCarteTextLabel("Warranty: " + warranty, "SansSerif", 
-            14, new Color(0x555555), JLabel.LEFT, Font.PLAIN);
+        JLabel warrantyLabel = createProductCarteTextLabel("Warranty: " + warranty, "SansSerif", 14, new Color(0x555555), JLabel.LEFT, Font.PLAIN);
         prepareLeft.accept(warrantyLabel);
         content.add(warrantyLabel);
-        content.add(Box.createVerticalStrut(5));
+        content.add(Box.createVerticalStrut(20));
 
-        // Stock quantity
-        Color stockColor = stockQuantity > 10 ? new Color(0x2FA84F) : 
-                          stockQuantity > 0 ? new Color(0xFF9800) : Color.RED;
-        String stockText = stockQuantity > 0 ? "In Stock: " + stockQuantity : "Out of Stock";
-        JLabel stockLabel = createProductCarteTextLabel(stockText, "SansSerif", 13, 
-            stockColor, JLabel.LEFT, Font.BOLD);
-        prepareLeft.accept(stockLabel);
-        content.add(stockLabel);
-        content.add(Box.createVerticalStrut(15));
-
-        // Bottom row with price and button
+        // Creating a bottom row so we can fit the price and button within the same horizontal space (Do not change it! i mean except for the row height but i do not recomand it, its perfect in my opinion)
         JPanel bottomRow = new JPanel();
         bottomRow.setOpaque(false);
         bottomRow.setLayout(new BoxLayout(bottomRow, BoxLayout.X_AXIS));
         bottomRow.setAlignmentX(Component.LEFT_ALIGNMENT);
-        bottomRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+        bottomRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60)); // Limit row height
 
-        // Price
-        JLabel priceLabel = createProductCarteTextLabel("$" + String.format("%.2f", price), 
-            "SansSerif", 18, new Color(0x2FA84F), JLabel.LEFT, Font.BOLD);
+        // Price text field u can guys modify the parms its fine as long as u respect the order
+        JLabel priceLabel = createProductCarteTextLabel("$" + String.format("%.2f", price), "SansSerif", 18, new Color(0x2FA84F), JLabel.LEFT, Font.BOLD);
         priceLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
         priceLabel.setHorizontalAlignment(SwingConstants.LEFT);
         priceLabel.setMaximumSize(new Dimension(Integer.MAX_VALUE, priceLabel.getPreferredSize().height));
         bottomRow.add(priceLabel);
-        bottomRow.add(Box.createHorizontalGlue());
+        bottomRow.add(Box.createHorizontalGlue());//This line pushes the button to the right side so do not touch it
 
-        // Add to Cart button
-        int[] btnColors = { 0x0F172A, 0x1E293B, 0x0F172A };
+        // Adding the button i can change params i tried to simplify the function utilisation as much as possible
+        int[] btnColors = { 0x0F172A, 0x1E293B, 0x0F172A }; //Vector(color states) = {pressed, hover, normal} make sure to respect the orders otherwise ur not gonna get the wanted output
+                                                           //Also i didn't add input handler so im trusting u guys to put hexadecimal values otherwise its not gonna give the exact wanted color
         JButton addToCartBtn = creatButton("Add to Cart", btnColors, 150, 40);
-        
-        // Disable button if out of stock
-        if (stockQuantity <= 0) {
-            addToCartBtn.setEnabled(false);
-            addToCartBtn.setText("Out of Stock");
-        }
-        
-        addToCartBtn.addActionListener(e -> {
-            // Handle add to cart action
-            JOptionPane.showMessageDialog(card, 
-                "Added " + productName + " to cart!\nProduct ID: " + productId,
-                "Success", 
-                JOptionPane.INFORMATION_MESSAGE);
-        });
-        
         Dimension btnPref = addToCartBtn.getPreferredSize();
         addToCartBtn.setMaximumSize(new Dimension(btnPref.width, btnPref.height));
         addToCartBtn.setAlignmentY(Component.CENTER_ALIGNMENT);
         bottomRow.add(addToCartBtn);
 
+       //do not touch this lines if ur curious what it does it only adds the bottom row inside the our main panel and refresh it
         content.add(bottomRow);
         card.revalidate();
         card.repaint();
 
-        return card;
+        return card; //we're returning the final assembled product card panel measure de sécurité ? 0/10 u guys need to be careful in ur inputs other wise u will not get the results ur looking for feel free to reach me out when u face issues in customization
     }
 
-    // Keep all the existing static helper methods below
+
     public static JPanel createProductPanel(int width, int height) {
         JPanel panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
+                //Do not change anything here its dynamic just give it the width and the height and it will give u ready panel
+                //maybe u can change the background color other then that do not touch it
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 int arc = 25;
@@ -265,6 +229,7 @@ public class ProductCardPanel extends JPanel {
                 g2.setColor(new Color(0xE5E5E5));
                 g2.setStroke(new BasicStroke(1f));
                 g2.draw(new RoundRectangle2D.Double(0, 0, getWidth() - 6, getHeight() - 6, arc, arc));
+
                 g2.dispose();
             }
 
@@ -273,92 +238,107 @@ public class ProductCardPanel extends JPanel {
                 return new Dimension(width, height);
             }
         };
+        //Assembling part
         panel.setOpaque(false);
         panel.setLayout(new BorderLayout());
         JPanel content = new JPanel();
         content.setOpaque(false);
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-        content.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        content.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); //Padding
         panel.add(content, BorderLayout.CENTER);
+
         return panel;
     }
-
     public static JPanel createImagePanel(Image image, int width, int height) {
-        return new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                int arc = 25;
-                Shape clip = new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), arc, arc);
-                g2.setClip(clip);
-                g2.setColor(Color.WHITE);
-                g2.fill(clip);
-                if (image != null) {
-                    double panelRatio = (double) getWidth() / getHeight();
-                    double imgRatio = (double) image.getWidth(this) / image.getHeight(this);
-                    int drawWidth, drawHeight;
-                    if (panelRatio > imgRatio) {
-                        drawWidth = getWidth();
-                        drawHeight = (int) (getWidth() / imgRatio);
-                    } else {
-                        drawHeight = getHeight();
-                        drawWidth = (int) (getHeight() * imgRatio);
-                    }
-                    int x = (getWidth() - drawWidth) / 2;
-                    int y = (getHeight() - drawHeight) / 2;
-                    g2.drawImage(image, x, y, drawWidth, drawHeight, this);
-                }
-                g2.setClip(null);
-                g2.setColor(new Color(0xE5E5E5));
-                g2.setStroke(new BasicStroke(1f));
-                g2.draw(clip);
-                g2.dispose();
-            }
+    	//Again its fully dynamic so do not change anything here
+    	//Just give it the image link, width and the height and it will render for u a ready image panel 
+	    return new JPanel() {
+	        @Override
+	        protected void paintComponent(Graphics g) {
+	            super.paintComponent(g);
+	            Graphics2D g2 = (Graphics2D) g.create();
+	            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	            int arc = 25; 
+	            Shape clip = new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), arc, arc);
+	            g2.setClip(clip);
+	            g2.setColor(Color.WHITE);
+	            g2.fill(clip);
+	            if (image != null) {
+	                double panelRatio = (double) getWidth() / getHeight();
+	                double imgRatio = (double) image.getWidth(this) / image.getHeight(this);
+	                int drawWidth, drawHeight;
+	                if (panelRatio > imgRatio) {
+	                    drawWidth = getWidth();
+	                    drawHeight = (int) (getWidth() / imgRatio);
+	                } else {
+	                    drawHeight = getHeight();
+	                    drawWidth = (int) (getHeight() * imgRatio);
+	                }
+	                int x = (getWidth() - drawWidth) / 2;
+	                int y = (getHeight() - drawHeight) / 2;
+	                g2.drawImage(image, x, y, drawWidth, drawHeight, this);
+	            }
+	            g2.setClip(null);
+	            g2.setColor(new Color(0xE5E5E5));
+	            g2.setStroke(new BasicStroke(1f));
+	            g2.draw(clip);
 
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(width, height);
-            }
-        };
-    }
+	            g2.dispose();
+	        }
 
-    public static JButton creatButton(String text, int[] colors, int width, int hight) {
-        JButton button = new JButton(text) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                if (getModel().isPressed()) {
-                    g2.setColor(new Color(colors[0]));
-                } else if (getModel().isRollover()) {
-                    g2.setColor(new Color(colors[1]));
-                } else {
-                    g2.setColor(new Color(colors[2]));
-                }
-                g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 30, 30));
-                g2.setColor(Color.WHITE);
-                g2.setFont(getFont().deriveFont(Font.BOLD, 16f));
-                FontMetrics fm = g2.getFontMetrics();
-                int x = (getWidth() - fm.stringWidth(getText())) / 2;
-                int y = (getHeight() + fm.getAscent()) / 2 - 3;
-                g2.drawString(getText(), x, y);
-                g2.dispose();
-            }
+	        @Override
+	        public Dimension getPreferredSize() {
+	            return new Dimension(width, height);
+	        }
+	    };
+	}
+    public static JButton creatButton(String text, int [] colors, int width, int hight ) {
+    	//Also here no need to change anything its dynamic
+		 JButton button = new JButton(text) {
+			 @Override
+			 protected void paintComponent(Graphics g) {
+			     super.paintComponent(g); // ✅ Important: clears the old content and repaints correctly
 
-            @Override
-            protected void paintBorder(Graphics g) {}
-        };
-        button.setFocusPainted(false);
-        button.setContentAreaFilled(false);
-        button.setBorderPainted(false);
-        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        button.setPreferredSize(new Dimension(width, hight));
-        return button;
-    }
+			     Graphics2D g2 = (Graphics2D) g.create();
+			     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+			     // Choose color based on button state
+			     if (getModel().isPressed()) {
+			         g2.setColor(new Color(colors[0]));
+			     } else if (getModel().isRollover()) {
+			         g2.setColor(new Color(colors[1]));
+			     } else {
+			         g2.setColor(new Color(colors[2]));
+			     }
+
+			     // Draw background with rounded corners
+			     g2.fill(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 30, 30));
+
+			     // Draw text
+			     g2.setColor(Color.WHITE);
+			     g2.setFont(getFont().deriveFont(Font.BOLD, 16f));
+			     FontMetrics fm = g2.getFontMetrics();
+			     int x = (getWidth() - fm.stringWidth(getText())) / 2;
+			     int y = (getHeight() + fm.getAscent()) / 2 - 3;
+			     g2.drawString(getText(), x, y);
+
+			     g2.dispose();
+			 }
+
+
+	            @Override
+	            protected void paintBorder(Graphics g) {} //Remove default border
+	        };
+	        button.setFocusPainted(false);
+	        button.setContentAreaFilled(false);
+	        button.setBorderPainted(false);
+	        button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+	        button.setPreferredSize(new Dimension(width, hight)); 
+	        return button;
+
+	}
     public static JLabel createTagLabel(String text) {
+    	//its not fully dynamic imma change it later 
         final String labelText = text == null ? "" : text.trim();
         JLabel label = new JLabel() {
             @Override
@@ -367,19 +347,33 @@ public class ProductCardPanel extends JPanel {
                 try {
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-                    Color bg = new Color(0xCFCFD7);
-                    Color border = new Color(0xE6E6E6);
-                    Color textColor = new Color(0x2E2E37);
+
+                   //u guys are free to change the colors here depending on ur needs
+                    Color bg = new Color(0xCFCFD7);       //This one is for the pill background
+                    Color border = new Color(0xE6E6E6);   //This one for the subtle border
+                    Color textColor = new Color(0x2E2E37); //And no need to explain this one too
+
+                    //U can also change the font here depending on what u want it to be
                     Font f = getFont().deriveFont(Font.PLAIN, 13f);
                     g2.setFont(f);
                     FontMetrics fm = g2.getFontMetrics();
-                    int padH = 14;
-                    int padV = 6;
+
+                    //Padding do not change it except if u really know what ur doing
+                    int padH = 14; //Horizontal padding
+                    int padV = 6;  //Vertical padding
+                    //Text field do not change it its perfect
                     int textW = fm.stringWidth(labelText);
                     int textH = fm.getAscent();
                     int w = textW + padH * 2;
                     int h = fm.getHeight() + padV * 2;
+                    if (getWidth() < w || getHeight() < h) {
+                        // requested size may be used by layout manager
+                        // don't fail—we'll draw within current size but keep centering logic
+                    }
                     int arc = h;
+                    //Drawing the background do not change anything here
+                    int bx = 0;
+                    int by = 0;
                     int bw = Math.max(1, getWidth());
                     int bh = Math.max(1, getHeight());
                     int pillW = Math.min(bw, w);
@@ -392,6 +386,7 @@ public class ProductCardPanel extends JPanel {
                     g2.setColor(border);
                     g2.setStroke(new BasicStroke(1f));
                     g2.draw(pill);
+                    //Drawing the text inside it
                     g2.setColor(textColor);
                     int tx = pillX + (pillW - textW) / 2;
                     int ty = pillY + (pillH - fm.getHeight()) / 2 + fm.getAscent();
@@ -402,7 +397,7 @@ public class ProductCardPanel extends JPanel {
             }
 
             @Override
-            public Dimension getPreferredSize() {
+            public Dimension getPreferredSize() {  
                 Font f = getFont().deriveFont(Font.PLAIN, 13f);
                 FontMetrics fm = getFontMetrics(f);
                 int padH = 14;
@@ -415,27 +410,26 @@ public class ProductCardPanel extends JPanel {
         label.setOpaque(false);
         label.setFont(new Font("SansSerif", Font.PLAIN, 13));
         label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        label.setToolTipText(labelText);
+        label.setToolTipText(labelText); //Extra feature it does not help in anything it just describe what is written with the same text that was written inside the pill, u can add ur own explanation tho 
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
         label.setMaximumSize(label.getPreferredSize());
         return label;
     }
-
-    public static JLabel createProductCarteTextLabel(String text, String font, int TextSize, 
-                                                     Color TextColor, int Alignment, int FontStyle) {
-        JLabel label = new JLabel(text) {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-                super.paintComponent(g2);
-                g2.dispose();
-            }
-        };
-        label.setFont(new Font(font, FontStyle, TextSize));
-        label.setForeground(TextColor);
-        label.setHorizontalAlignment(Alignment);
-        label.setOpaque(false);
-        return label;
-    }
+    public static JLabel createProductCarteTextLabel(String text, String font, int TextSize, Color TextColor, int Alignment, int  FontStyle) {
+	   //No need to explain this one its fully dynamic so do not change it
+    	JLabel label = new JLabel(text) {
+	        @Override
+	        protected void paintComponent(Graphics g) {
+	            Graphics2D g2 = (Graphics2D) g.create();
+	            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+	            super.paintComponent(g2);
+	            g2.dispose();
+	        }
+	    };
+	    label.setFont(new Font(font, FontStyle, TextSize));
+	    label.setForeground(TextColor);
+	    label.setHorizontalAlignment(Alignment);
+	    label.setOpaque(false);
+	    return label;
+	}
 }

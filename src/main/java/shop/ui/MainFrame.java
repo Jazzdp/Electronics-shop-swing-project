@@ -1,12 +1,18 @@
 package shop.ui;
 
 import javax.swing.*;
+import javax.swing.border.AbstractBorder;
+import javax.swing.border.EmptyBorder;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+
 import shop.controllers.ProductController;
 import shop.repositories.ProductRepository;
+import shop.ui.SearchPanel;
 
 public class MainFrame extends JFrame {
     private final ProductController productController;
@@ -15,14 +21,11 @@ public class MainFrame extends JFrame {
         super("ElectroShop");
         this.productController = productController;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 650);
-        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-
         // navbar
         JPanel topContainer = new JPanel(new BorderLayout());
         topContainer.add(new NavbarPanel(), BorderLayout.NORTH);
-        topContainer.add(new SearchPanel(), BorderLayout.SOUTH);
+        topContainer.add( new SearchPanel(), BorderLayout.SOUTH);
         add(topContainer, BorderLayout.NORTH);
 
         // Catalogue 
@@ -38,9 +41,9 @@ public class MainFrame extends JFrame {
             try {
                 // Create database connection
                 Connection connection = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/your_database", 
-                    "username", 
-                    "password"
+                    "jdbc:mysql://localhost:3306/electronic_shop", 
+                    "root", 
+                    "Rayane#2004"
                 );
                 
                 // Create repository and controller
@@ -49,8 +52,10 @@ public class MainFrame extends JFrame {
                 
                 // Create and show frame
                 MainFrame frame = new MainFrame(productController);
+                frame.pack();
                 frame.setVisible(true);
-            } catch (Exception e) {
+                
+                } catch (Exception e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(null, 
                     "Error connecting to database: " + e.getMessage(),
@@ -59,4 +64,5 @@ public class MainFrame extends JFrame {
             }
         });
     }
+    
 }

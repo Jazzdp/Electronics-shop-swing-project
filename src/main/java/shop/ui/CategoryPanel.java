@@ -8,8 +8,7 @@ import shop.util.Palette;
 public class CategoryPanel extends JPanel {
    
 private static final int[] btnCols = {
-    Palette.PRIMARY.getRGB(),
-    Palette.ON_PRIMARY.getRGB()
+		0x0F172A, 0x1E293B, 0x0F172A
 };
 
   public CategoryPanel() {     
