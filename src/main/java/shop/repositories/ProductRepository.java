@@ -98,7 +98,7 @@ public class ProductRepository {
         }
     }
 
-    public List<Product> findByCategory(String category) {
+   public List<Product> findByCategory(String category) {
         String sql = "SELECT * FROM products WHERE category = ? ORDER BY name";
         List<Product> products = new ArrayList<>();
         

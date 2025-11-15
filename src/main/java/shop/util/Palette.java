@@ -23,4 +23,15 @@ public final class Palette {
 
     // Search / light gray background
     public static final Color SEARCH_BG = new Color(245, 247, 250);
+    
+	// Colors
+	public static final Color DARK_NAVY = new Color(7, 21, 40); // main button color
+	public static final Color DARK_NAVY_ACCENT = new Color(10, 28, 55); // slightly lighter for hover/selected
+	public static final Color TEXT_ON_DARK = Color.WHITE;
+	public static final Color PANEL_BG = new Color(245, 245, 245);
+
+	// Sizes / typography
+	public static final int CATEGORY_FONT_SIZE = 22;
+	public static final int CATEGORY_BUTTON_WIDTH = 220;
+	public static final int CATEGORY_BUTTON_HEIGHT = 56;
 }

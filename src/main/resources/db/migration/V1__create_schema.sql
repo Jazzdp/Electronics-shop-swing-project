@@ -6,7 +6,7 @@
 
 CREATE TABLE IF NOT EXISTS products (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  pic_url VARCHAR(512),
+  pic_url VARCHAR(4096),
   name VARCHAR(255) NOT NULL,
   cateory VARCHAR(20),
   model_number VARCHAR(100),
