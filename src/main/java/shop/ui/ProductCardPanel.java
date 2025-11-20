@@ -5,15 +5,18 @@ import java.awt.image.BufferedImage;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import shop.controllers.ProductController;
+import shop.controllers.CartController;
 import shop.model.Product;
 import java.net.URL;
 import java.util.List;
 
 public class ProductCardPanel extends JPanel {
     private final ProductController productController;
+    private final CartController cartController;
     private JPanel cardsContainer;
-    public ProductCardPanel(ProductController productController) {
+    public ProductCardPanel(ProductController productController, CartController cartController) {
         this.productController = productController;
+        this.cartController = cartController;
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
@@ -104,18 +107,42 @@ public class ProductCardPanel extends JPanel {
         String warrantyText = product.getWarrantyMonths() + " " +
                 (product.getWarrantyMonths() == 1 ? "Month" : "Months");
 
-        // Adaptation : respecter l’ordre et le nombre de paramètres exacts de createProductCard
-        return createProductCard(
-            img,                         // Image
-            product.getName(),           // productName
-            product.getCategory(),       // tagText
-            product.getModelNumber(),    // model
-            warrantyText,                // warranty
-            product.getDescription(),    // description
-            product.getStockQuantity(),  // stock
-            product.getPrice()           // price
+        // Create base card
+        JPanel card = createProductCard(
+            img,                         
+            product.getName(),           
+            product.getCategory(),       
+            product.getModelNumber(),    
+            warrantyText,                
+            product.getDescription(),    
+            product.getStockQuantity(),  
+            product.getPrice()           
         );
+        
+        // Find and wire the Add to Cart button
+        for (Component comp : ((JPanel)card.getComponent(0)).getComponents()) {
+            if (comp instanceof JPanel) {
+                JPanel panel = (JPanel) comp;
+                for (Component subComp : panel.getComponents()) {
+                    if (subComp instanceof JButton && ((JButton)subComp).getText().contains("Add to Cart")) {
+                        JButton btn = (JButton) subComp;
+                        btn.addActionListener(e -> {
+                            try {
+                                cartController.addToCart(product.getId(), 1);
+                                JOptionPane.showMessageDialog(ProductCardPanel.this, product.getName() + " added to cart!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                            } catch (Exception ex) {
+                                JOptionPane.showMessageDialog(ProductCardPanel.this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        });
+                        break;
+                    }
+                }
+            }
+        }
+        
+        return card;
     }
+
     public static Image getDefaultImage() {
         Image img = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
         Graphics g = img.getGraphics();

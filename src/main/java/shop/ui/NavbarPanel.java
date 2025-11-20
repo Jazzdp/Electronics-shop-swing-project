@@ -4,10 +4,10 @@ import javax.swing.*;
 import shop.ui.ProductCardPanel;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
-import shop.ui.CartPanel;
 import shop.util.Palette;
 
 public class NavbarPanel extends JPanel {
+    private JButton cartButton;
 
     public NavbarPanel() {      
           setLayout(new BorderLayout());    
@@ -17,21 +17,18 @@ public class NavbarPanel extends JPanel {
                title.setForeground(Palette.ON_PRIMARY);     
                   title.setFont(title.getFont().deriveFont(Font.BOLD,18f));      
                     add(title, BorderLayout.WEST);     
-                       int[] btnColors = { 0x0F172A, 0x1E293B, 0x0F172A }; //Vector(color states) = {pressed, hover, normal} make sure to respect the orders otherwise ur not gonna get the wanted output
+                       int[] btnColors = { 0x0F172A, 0x1E293B, 0x0F172A };
                      
-                       JButton cartButton = creatButton("Cart", btnColors, 110, 36);      
+                       cartButton = creatButton("Cart", btnColors, 110, 36);      
                      cartButton.setBackground(Palette.ON_PRIMARY); 
                       cartButton.setForeground(Palette.PRIMARY);    
-                          cartButton.setFocusPainted(false);    
-						  cartButton.addActionListener(e->{
-							JFrame test = new JFrame();
-							test.add( new CartPanel().cartpanel);
-							test.pack();
-							test.setVisible(true);
-
-						  }); 
+                          cartButton.setFocusPainted(false);
                                add(cartButton, BorderLayout.EAST);   
-							 }
+    }
+
+    public JButton getCartButton() {
+        return cartButton;
+    }
     public static JButton creatButton(String text, int [] colors, int width, int hight ) {
     	//Also here no need to change anything its dynamic
 		 JButton button = new JButton(text) {

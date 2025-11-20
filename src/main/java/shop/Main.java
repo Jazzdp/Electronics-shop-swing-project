@@ -5,7 +5,9 @@ import javax.swing.SwingUtilities;
 import shop.config.DbConfig;
 import shop.config.DbInit;
 import shop.controllers.ProductController;
+import shop.controllers.CartController;
 import shop.repositories.ProductRepository;
+import shop.repositories.CartRepository;
 import java.sql.Connection;
 import shop.ui.MainFrame;
 
@@ -55,10 +57,12 @@ public class Main {
 
       Connection conn = DbConfig.getConnection();
       ProductRepository productRepository = new ProductRepository(conn);
+      CartRepository cartRepository = new CartRepository(conn, productRepository);
       ProductController productController = new ProductController(productRepository);
+      CartController cartController = new CartController(cartRepository, productRepository);
 
       SwingUtilities.invokeLater(() -> {
-        new MainFrame(productController).setVisible(true);
+        new MainFrame(productController, cartController).setVisible(true);
       });
     } catch (Exception e) {
       e.printStackTrace();

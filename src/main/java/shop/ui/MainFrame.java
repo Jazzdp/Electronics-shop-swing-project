@@ -11,20 +11,24 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 
 import shop.controllers.ProductController;
+import shop.controllers.CartController;
 import java.util.concurrent.atomic.AtomicReference;
 // product model not referenced directly in this frame
 import shop.repositories.ProductRepository;
+import shop.repositories.CartRepository;
 import shop.ui.SearchPanel;
 import shop.ui.NavbarPanel;
 import shop.ui.CategoryPanel;
 
 public class MainFrame extends JFrame {
     private final ProductController productController;
+    private final CartController cartController;
     private javax.swing.Timer searchTimer;
     
-    public MainFrame(ProductController productController) {
+    public MainFrame(ProductController productController, CartController cartController) {
         super("ElectroShop");
         this.productController = productController;
+        this.cartController = cartController;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         
@@ -32,15 +36,16 @@ public class MainFrame extends JFrame {
        container.setBorder(new EmptyBorder(0, 0, 0, 0));
         // navbar
         JPanel topContainer = new JPanel(new BorderLayout());
-        topContainer.add(new NavbarPanel(), BorderLayout.NORTH);
+        NavbarPanel navbarPanel = new NavbarPanel();
+        topContainer.add(navbarPanel, BorderLayout.NORTH);
         SearchPanel searchPanel = new SearchPanel();
         topContainer.add(searchPanel, BorderLayout.SOUTH);
 
         // Catalogue
 
         // Use the real ProductCardPanel which renders cards
-        ProductCardPanel productPanel = new ProductCardPanel(productController);
-        ProductListPanel listPanel = new ProductListPanel(productController);
+        ProductCardPanel productPanel = new ProductCardPanel(productController, cartController);
+        ProductListPanel listPanel = new ProductListPanel(productController, cartController);
         // start in card view (use AtomicReference so lambda can update it)
         AtomicReference<JComponent> currentCenter = new AtomicReference<>(productPanel);
         container.add(new CategoryPanel(category -> {
@@ -105,8 +110,18 @@ public class MainFrame extends JFrame {
             }
         });
         
-    container.add(topContainer, BorderLayout.NORTH);
-    add(container);
+        container.add(topContainer, BorderLayout.NORTH);
+        add(container);
+        
+        // Wire cart button to show cart window
+        navbarPanel.getCartButton().addActionListener(e -> {
+            JFrame cartWindow = new JFrame("Shopping Cart");
+            cartWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            cartWindow.add(new CartPanel(cartController, cartWindow));
+            cartWindow.setSize(900, 600);
+            cartWindow.setLocationRelativeTo(null);
+            cartWindow.setVisible(true);
+        });
     }
 
     public static void main(String[] args) {
@@ -119,13 +134,15 @@ public class MainFrame extends JFrame {
                     ""
                 );
                 
-                // Create repository and controller
+                // Create repositories and controllers
                 ProductRepository productRepository = new ProductRepository(connection);
+                CartRepository cartRepository = new CartRepository(connection, productRepository);
                 ProductController productController = new ProductController(productRepository);
+                CartController cartController = new CartController(cartRepository, productRepository);
                 
                 // Create and show frame
-                MainFrame frame = new MainFrame(productController);
-                                frame.pack();
+                MainFrame frame = new MainFrame(productController, cartController);
+                frame.pack();
 
                 frame.setVisible(true);
                 

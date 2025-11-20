@@ -3,14 +3,17 @@ package shop.ui;
 import javax.swing.*;
 import java.awt.*;
 import shop.controllers.ProductController;
+import shop.controllers.CartController;
 import shop.model.Product;
 
 public class ProductListPanel extends JPanel {
     private final ProductController productController;
+    private final CartController cartController;
     private final JPanel listContainer;
 
-    public ProductListPanel(ProductController productController) {
+    public ProductListPanel(ProductController productController, CartController cartController) {
         this.productController = productController;
+        this.cartController = cartController;
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
@@ -119,6 +122,14 @@ public class ProductListPanel extends JPanel {
         right.add(price);
         right.add(Box.createVerticalGlue());
         JButton addBtn = ProductCardPanel.creatButton("Add to Cart", new int[]{0x0F172A,0x1E293B,0x0F172A}, 120, 32);
+        addBtn.addActionListener(e -> {
+            try {
+                cartController.addToCart(p.getId(), 1);
+                JOptionPane.showMessageDialog(this, p.getName() + " added to cart!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
         right.add(addBtn);
         right.setBorder(BorderFactory.createEmptyBorder(4, 8, 4, 4));
         row.add(right, BorderLayout.EAST);
