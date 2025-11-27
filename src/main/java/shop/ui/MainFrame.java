@@ -4,6 +4,8 @@ import javax.swing.*;
 import javax.swing.border.AbstractBorder;
 import javax.swing.border.EmptyBorder;
 
+import com.mysql.cj.x.protobuf.MysqlxCrud.Order;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.awt.*;
@@ -19,16 +21,20 @@ import shop.repositories.CartRepository;
 import shop.ui.SearchPanel;
 import shop.ui.NavbarPanel;
 import shop.ui.CategoryPanel;
+import shop.controllers.OrderController;
+import shop.repositories.OrderRepository;
 
 public class MainFrame extends JFrame {
     private final ProductController productController;
     private final CartController cartController;
     private javax.swing.Timer searchTimer;
+    private final OrderController orderController;
     
-    public MainFrame(ProductController productController, CartController cartController) {
+    public MainFrame(ProductController productController, CartController cartController, OrderController orderController ) {
         super("ElectroShop");
         this.productController = productController;
         this.cartController = cartController;
+        this.orderController = orderController;
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         
@@ -117,7 +123,7 @@ public class MainFrame extends JFrame {
         navbarPanel.getCartButton().addActionListener(e -> {
             JFrame cartWindow = new JFrame("Shopping Cart");
             cartWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            cartWindow.add(new CartPanel(cartController, cartWindow));
+            cartWindow.add(new CartPanel(cartController,orderController, cartWindow));
             cartWindow.setSize(900, 600);
             cartWindow.setLocationRelativeTo(null);
             cartWindow.setVisible(true);
@@ -139,9 +145,10 @@ public class MainFrame extends JFrame {
                 CartRepository cartRepository = new CartRepository(connection, productRepository);
                 ProductController productController = new ProductController(productRepository);
                 CartController cartController = new CartController(cartRepository, productRepository);
-                
+                OrderRepository orderRepository = new OrderRepository(connection, productRepository);
+                OrderController orderController = new OrderController(orderRepository, productRepository);
                 // Create and show frame
-                MainFrame frame = new MainFrame(productController, cartController);
+                MainFrame frame = new MainFrame(productController, cartController,orderController);
                 frame.pack();
 
                 frame.setVisible(true);

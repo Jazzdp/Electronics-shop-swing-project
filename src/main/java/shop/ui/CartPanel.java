@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.util.List;
 import shop.controllers.CartController;
+import shop.controllers.OrderController;
 import shop.model.CartItem;
 import shop.model.Product;
 import shop.util.Palette;
@@ -18,22 +19,30 @@ public class CartPanel extends JPanel {
     private JButton continueShopping;
     private JPanel emptyCartPanel;
     private JFrame parentWindow;
+    private shop.controllers.OrderController orderController; 
+    private List<CartItem> cartItems;
+   
+private final JFrame parentFrame; 
 
-    public CartPanel(CartController cartController, JFrame parentWindow) {
-        this.cartController = cartController;
-        this.parentWindow = parentWindow;
-        setLayout(new BorderLayout());
+public CartPanel(CartController cartController,
+                 OrderController orderController,
+                 JFrame parentFrame) {
+
+    this.cartController = cartController;
+    this.orderController = orderController;
+    this.parentFrame   = parentFrame;
+    setLayout(new BorderLayout());
         setBackground(Palette.SURFACE);
-
-        // Header
-        add(createHeader(), BorderLayout.NORTH);
+           add(createHeader(), BorderLayout.NORTH);
 
         // Main content with cart items and summary
         add(createMainContent(), BorderLayout.CENTER);
 
         // Refresh cart display
         refreshCart();
-    }
+}
+
+   
 
     private JPanel createHeader() {
         JPanel header = new JPanel(new BorderLayout());
@@ -134,19 +143,29 @@ public class CartPanel extends JPanel {
         checkoutButton = createCheckoutButton();
         checkoutButton.setFont(new Font("SansSerif", Font.BOLD, 14));
         checkoutButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+          
         checkoutButton.addActionListener(e -> {
-            // Open checkout window and close cart
-            JFrame checkoutFrame = new JFrame("Checkout");
-            checkoutFrame.setSize(400, 300);
-            checkoutFrame.setLocationRelativeTo(this);
-            checkoutFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            checkoutFrame.setLayout(new BorderLayout());
-            JLabel label = new JLabel("Checkout coming soon!", SwingConstants.CENTER);
-            label.setFont(new Font("SansSerif", Font.BOLD, 20));
-            checkoutFrame.add(label, BorderLayout.CENTER);
-            checkoutFrame.setVisible(true);
-            if (parentWindow != null) parentWindow.dispose();
-        });
+
+    JFrame checkoutFrame = new JFrame("Checkout");
+    checkoutFrame.setSize(500, 600);
+    checkoutFrame.setLocationRelativeTo(this);
+    checkoutFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+List<CartItem> items = cartController.getCartItems();
+
+   checkoutFrame.setLayout(new BorderLayout());
+    checkoutFrame.add(new CheckoutPanel(
+        orderController,
+        cartController.getCartItems(), // <-- make sure this list is not empty
+        () -> {
+              cartController.clearCart(); 
+            if (parentFrame != null) parentFrame.dispose(); // safely close
+            checkoutFrame.dispose();
+        }
+    ), BorderLayout.CENTER);
+
+    
+    checkoutFrame.setVisible(true);
+});
         rightPanel.add(checkoutButton);
 
         rightPanel.add(Box.createVerticalStrut(12));
