@@ -1,29 +1,27 @@
 package shop.ui;
 import javax.swing.*;
 import java.awt.*;
-public class ProductListPanel extends JPanel {
+import java.awt.geom.RoundRectangle2D;
+public class ProductListPanel extends JFrame {
 
     public ProductListPanel() {
+    JPanel panel = createProductPanel(1200,800);
+     setLayout(new FlowLayout());
+     add(panel);
+     setVisible(true);
+     pack();
+    }
+    public static void main(String[]arg) {
+    	new ProductListPanel();
+    }
+    public static JPanel createProductPanel(int width, int height) {
+        JPanel panel = new JPanel() {
+         
+        };
+        //Assembling part
+        
 
-     /*  setLayout(new FlowLayout(FlowLayout.LEFT, 20, 20));
-        setBackground(Color.WHITE);
-
-        // exampple
-        Image img = new ImageIcon("photo-1631011714977-a6068c048b7b.jfif").getImage();
-
-        for (int i = 0; i < 6; i++) {
-            JPanel card = ProductCardPanel.createProductCard(
-                    img,
-                    "iPhone 15 Pro",
-                    "Apple",
-                    "Smartphone",
-                    "WXH-3759",
-                    "Radio",
-                    999.99
-            );
-
-            add(card);
-        } */
+        return panel;
     }
 }
 

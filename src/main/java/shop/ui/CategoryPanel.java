@@ -1,6 +1,7 @@
 package shop.ui;
 
 import javax.swing.*;
+import Components.Button;
 import java.awt.*;
 import shop.util.Palette;
 
@@ -22,7 +23,7 @@ private static final int[] btnCols = {
  add(Box.createRigidArea(new Dimension(0, 8)));      
    String[] cats = {"All", "Phones", "Laptops", "Ipads", "Audio", "Accessories", "Smart Watches"};     
       for (String c : cats) {     
-                   JButton b = ProductCardPanel.creatButton(c, btnCols, 160, 36);       
+                   JButton b = new Button(c, btnCols, 160, 36);       
                      b.setAlignmentX(Component.LEFT_ALIGNMENT);           
                       b.setMaximumSize(new Dimension(160,36));      
                      b.setFocusPainted(false);       
