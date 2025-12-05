@@ -29,26 +29,40 @@ public class CheckoutPanel extends JPanel {
         add(title, BorderLayout.NORTH);
 
         // ===== FORM FIELDS =====
-        JPanel form = new JPanel(new GridLayout(8, 1, 10, 10));
+        JPanel form = new JPanel();
+        form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
         form.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
-        JTextField nameField = new JTextField();
-        JTextField emailField = new JTextField();
-        JTextField phoneField = new JTextField();
+        JTextField nameField = new JTextField(20);
+        JTextField emailField = new JTextField(20);
+        JTextField phoneField = new JTextField(20);
         JTextArea addressField = new JTextArea(3, 20);
         addressField.setLineWrap(true);
         addressField.setWrapStyleWord(true);
 
-        form.add(new JLabel("Full Name:"));
-        form.add(nameField);
-        form.add(new JLabel("Email:"));
-        form.add(emailField);
-        form.add(new JLabel("Phone:"));
-        form.add(phoneField);
-        form.add(new JLabel("Shipping Address:"));
-
+        // Create horizontal panels for each field
+        JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        namePanel.add(new JLabel("Full Name:"));
+        namePanel.add(nameField);
+        
+        JPanel emailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        emailPanel.add(new JLabel("Email:"));
+        emailPanel.add(emailField);
+        
+        JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        phonePanel.add(new JLabel("Phone:"));
+        phonePanel.add(phoneField);
+        
+        JPanel addressPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
+        addressPanel.add(new JLabel("Shipping Address:"));
         JScrollPane addressScroll = new JScrollPane(addressField);
-        form.add(addressScroll);
+        addressScroll.setPreferredSize(new Dimension(200, 60));
+        addressPanel.add(addressScroll);
+
+        form.add(namePanel);
+        form.add(emailPanel);
+        form.add(phonePanel);
+        form.add(addressPanel);
 
         add(form, BorderLayout.CENTER);
 
