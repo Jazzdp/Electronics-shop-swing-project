@@ -8,6 +8,7 @@ import shop.util.Palette;
 
 public class NavbarPanel extends JPanel {
     private JButton cartButton;
+    private int cartItemCount = 0;
 
     public NavbarPanel() {      
           setLayout(new BorderLayout());    
@@ -19,7 +20,7 @@ public class NavbarPanel extends JPanel {
                     add(title, BorderLayout.WEST);     
                        int[] btnColors = { 0x0F172A, 0x1E293B, 0x0F172A };
                      
-                       cartButton = creatButton("Cart", btnColors, 110, 36);      
+                       cartButton = creatButton("🛒 Cart (0)", btnColors, 140, 36);      
                      cartButton.setBackground(Palette.ON_PRIMARY); 
                       cartButton.setForeground(Palette.PRIMARY);    
                           cartButton.setFocusPainted(false);
@@ -28,6 +29,15 @@ public class NavbarPanel extends JPanel {
 
     public JButton getCartButton() {
         return cartButton;
+    }
+    
+    public void updateCartCount(int count) {
+        cartItemCount = count;
+        cartButton.setText("🛒 Cart (" + count + ")");
+    }
+    
+    public int getCartItemCount() {
+        return cartItemCount;
     }
     public static JButton creatButton(String text, int [] colors, int width, int hight ) {
     	//Also here no need to change anything its dynamic

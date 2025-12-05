@@ -50,8 +50,8 @@ public class MainFrame extends JFrame {
         // Catalogue
 
         // Use the real ProductCardPanel which renders cards
-        ProductCardPanel productPanel = new ProductCardPanel(productController, cartController);
-        ProductListPanel listPanel = new ProductListPanel(productController, cartController);
+        ProductCardPanel productPanel = new ProductCardPanel(productController, cartController, navbarPanel);
+        ProductListPanel listPanel = new ProductListPanel(productController, cartController, navbarPanel);
         // start in card view (use AtomicReference so lambda can update it)
         AtomicReference<JComponent> currentCenter = new AtomicReference<>(productPanel);
         container.add(new CategoryPanel(category -> {
@@ -119,11 +119,16 @@ public class MainFrame extends JFrame {
         container.add(topContainer, BorderLayout.NORTH);
         add(container);
         
+        // Initialize cart counter
+        navbarPanel.updateCartCount(cartController.getItemCount());
+        
         // Wire cart button to show cart window
         navbarPanel.getCartButton().addActionListener(e -> {
             JFrame cartWindow = new JFrame("Shopping Cart");
             cartWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            cartWindow.add(new CartPanel(cartController,orderController, cartWindow));
+            CartPanel cartPanel = new CartPanel(cartController, orderController, cartWindow);
+            cartPanel.setNavbarPanel(navbarPanel);
+            cartWindow.add(cartPanel);
             cartWindow.setSize(900, 600);
             cartWindow.setLocationRelativeTo(null);
             cartWindow.setVisible(true);

@@ -21,6 +21,7 @@ public class CartPanel extends JPanel {
     private JFrame parentWindow;
     private shop.controllers.OrderController orderController; 
     private List<CartItem> cartItems;
+    private NavbarPanel navbarPanel;
    
 private final JFrame parentFrame; 
 
@@ -41,6 +42,10 @@ public CartPanel(CartController cartController,
         // Refresh cart display
         refreshCart();
 }
+
+    public void setNavbarPanel(NavbarPanel navbarPanel) {
+        this.navbarPanel = navbarPanel;
+    }
 
    
 
@@ -158,6 +163,9 @@ List<CartItem> items = cartController.getCartItems();
         cartController.getCartItems(), // <-- make sure this list is not empty
         () -> {
               cartController.clearCart(); 
+            if (navbarPanel != null) {
+                navbarPanel.updateCartCount(0);
+            }
             if (parentFrame != null) parentFrame.dispose(); // safely close
             checkoutFrame.dispose();
         }
@@ -376,6 +384,9 @@ List<CartItem> items = cartController.getCartItems();
                 return;
             }
             cartController.updateQuantity(productId, newQuantity);
+            if (navbarPanel != null) {
+                navbarPanel.updateCartCount(cartController.getItemCount());
+            }
             refreshCart();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error updating quantity: " + e.getMessage(),
@@ -386,6 +397,9 @@ List<CartItem> items = cartController.getCartItems();
     private void removeFromCart(Long productId) {
         try {
             cartController.removeFromCart(productId);
+            if (navbarPanel != null) {
+                navbarPanel.updateCartCount(cartController.getItemCount());
+            }
             refreshCart();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error removing item: " + e.getMessage(),

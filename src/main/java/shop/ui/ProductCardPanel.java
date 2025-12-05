@@ -13,10 +13,12 @@ import java.util.List;
 public class ProductCardPanel extends JPanel {
     private final ProductController productController;
     private final CartController cartController;
+    private final NavbarPanel navbarPanel;
     private JPanel cardsContainer;
-    public ProductCardPanel(ProductController productController, CartController cartController) {
+    public ProductCardPanel(ProductController productController, CartController cartController, NavbarPanel navbarPanel) {
         this.productController = productController;
         this.cartController = cartController;
+        this.navbarPanel = navbarPanel;
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
 
@@ -129,6 +131,7 @@ public class ProductCardPanel extends JPanel {
                         btn.addActionListener(e -> {
                             try {
                                 cartController.addToCart(product.getId(), 1);
+                                navbarPanel.updateCartCount(cartController.getItemCount());
                                 JOptionPane.showMessageDialog(ProductCardPanel.this, product.getName() + " added to cart!", "Success", JOptionPane.INFORMATION_MESSAGE);
                             } catch (Exception ex) {
                                 JOptionPane.showMessageDialog(ProductCardPanel.this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
