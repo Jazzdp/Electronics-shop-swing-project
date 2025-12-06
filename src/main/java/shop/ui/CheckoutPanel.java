@@ -29,40 +29,75 @@ public class CheckoutPanel extends JPanel {
         add(title, BorderLayout.NORTH);
 
         // ===== FORM FIELDS =====
-        JPanel form = new JPanel();
-        form.setLayout(new BoxLayout(form, BoxLayout.Y_AXIS));
+        JPanel form = new JPanel(new GridBagLayout());
         form.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
 
-        JTextField nameField = new JTextField(20);
-        JTextField emailField = new JTextField(20);
-        JTextField phoneField = new JTextField(20);
-        JTextArea addressField = new JTextArea(3, 20);
+        JTextField nameField = new JTextField(25);
+        JTextField emailField = new JTextField(25);
+        JTextField phoneField = new JTextField(25);
+        JTextArea addressField = new JTextArea(3, 25);
         addressField.setLineWrap(true);
         addressField.setWrapStyleWord(true);
-
-        // Create horizontal panels for each field
-        JPanel namePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-        namePanel.add(new JLabel("Full Name:"));
-        namePanel.add(nameField);
-        
-        JPanel emailPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-        emailPanel.add(new JLabel("Email:"));
-        emailPanel.add(emailField);
-        
-        JPanel phonePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-        phonePanel.add(new JLabel("Phone:"));
-        phonePanel.add(phoneField);
-        
-        JPanel addressPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-        addressPanel.add(new JLabel("Shipping Address:"));
         JScrollPane addressScroll = new JScrollPane(addressField);
-        addressScroll.setPreferredSize(new Dimension(200, 60));
-        addressPanel.add(addressScroll);
 
-        form.add(namePanel);
-        form.add(emailPanel);
-        form.add(phonePanel);
-        form.add(addressPanel);
+        // Full Name
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        JLabel nameLabel = new JLabel("Full Name:");
+        nameLabel.setPreferredSize(new Dimension(120, 25));
+        form.add(nameLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        form.add(nameField, gbc);
+        
+        // Email
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        JLabel emailLabel = new JLabel("Email:");
+        emailLabel.setPreferredSize(new Dimension(120, 25));
+        form.add(emailLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        form.add(emailField, gbc);
+        
+        // Phone
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        JLabel phoneLabel = new JLabel("Phone:");
+        phoneLabel.setPreferredSize(new Dimension(120, 25));
+        form.add(phoneLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        form.add(phoneField, gbc);
+        
+        // Shipping Address
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        JLabel addressLabel = new JLabel("Shipping Address:");
+        addressLabel.setPreferredSize(new Dimension(120, 25));
+        form.add(addressLabel, gbc);
+        
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        form.add(addressScroll, gbc);
 
         add(form, BorderLayout.CENTER);
 
